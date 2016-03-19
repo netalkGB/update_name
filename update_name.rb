@@ -39,7 +39,7 @@ begin
   end
 
   client2.user do |object|
-    if object.instance_of? Twitter::Tweet
+    if object.is_a? Twitter::Tweet
       if object.user.id == my_id && object.text =~ /^@#{my_screen_name}\s###update_name###\s+/
         puts object.text.sub /^@#{my_screen_name}\s###update_name###\s/,""
         new_user_name = object.text.sub /^@#{my_screen_name}\s###update_name###\s/,""
@@ -51,7 +51,10 @@ begin
 rescue Twitter::Error::ServerError => e
   p e
   retry_count += 1
-  retry if retry_count < 3 # エラーが出たら再接続（再ツイートではない）
+  if retry_count < 5 # エラーが出たら再接続（再ツイートではない）
+    sleep 30
+    retry
+  end
 rescue Twitter::Error::ClientError => e
   p e
 rescue => e
