@@ -1,12 +1,11 @@
 require 'bundler'
 require './auth.rb'
-require './settings.rb'
 require 'yaml'
 Bundler.require
 tokens = {}
 unless File.exist? "./.config"
   puts "初回起動時は設定が必要です"
-  auth = Auth.new Consumer_key,Consumer_secret
+  auth = Auth.new ENV['TWITTER_CONSUMER_KEY'],ENV['CONSUMER_SECRET']
   puts "行け #{auth.authorize_url}"
   print "PINを入力してね=> ";auth.pin gets.to_i
   tokens[:access_token] = auth.access_token
@@ -21,8 +20,8 @@ end
 
 begin
   client = Twitter::REST::Client.new do |config|
-    config.consumer_key        = Consumer_key
-    config.consumer_secret     = Consumer_secret
+    config.consumer_key        = ENV['TWITTER_CONSUMER_KEY']
+    config.consumer_secret     = ENV['CONSUMER_SECRET']
     config.access_token        = tokens[:access_token]
     config.access_token_secret = tokens[:access_token_secret]
   end
@@ -32,8 +31,8 @@ begin
 
   retry_count = 0
   client2 = Twitter::Streaming::Client.new do |config|
-    config.consumer_key        = Consumer_key
-    config.consumer_secret     = Consumer_secret
+    config.consumer_key        = ENV['TWITTER_CONSUMER_KEY']
+    config.consumer_secret     = ENV['CONSUMER_SECRET']
     config.access_token        = tokens[:access_token]
     config.access_token_secret = tokens[:access_token_secret]
   end
